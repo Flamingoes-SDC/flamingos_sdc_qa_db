@@ -2,7 +2,11 @@ const { Sequelize, DataTypes, QueryTypes, Model } = require('sequelize');
 const Promise = require('bluebird');
 require('dotenv').config();
 
-const sequelize = new Sequelize(`postgres://${process.env.pgUser}:${process.env.pgPassword}@localhost:${process.env.pgPORT}/sdc`, {
+// const sequelize = new Sequelize(`postgres://${process.env.pgUser}:${process.env.pgPassword}@localhost:${process.env.pgPORT}/sdc`, {
+//   logging: false,
+// });
+
+const sequelize = new Sequelize(`postgres://${process.env.cloudUser}:${process.env.cloudPassword}@${process.env.cloudURL}:${process.env.pgPORT}/flamingos_qa`, {
   logging: false,
 });
 
@@ -340,19 +344,21 @@ const addAnswer = (question_id, body, name, email, photos) => (
   })
     .then((data) => {
       if (data) {
-        return Answers.update({
-          body,
-          date_written: Date.now(),
-          answerer_name: name,
-          answerer_email: email,
-          reported: false,
-          helpful: 0,
-        },
-        {
-          where: {
-            id: data.id
+        return Answers.update(
+          {
+            body,
+            date_written: Date.now(),
+            answerer_name: name,
+            answerer_email: email,
+            reported: false,
+            helpful: 0,
           },
-        });
+          {
+            where: {
+              id: data.id,
+            },
+          },
+        );
       }
       return Answers.create({
         question_id,
